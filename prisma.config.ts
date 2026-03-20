@@ -10,7 +10,5 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"]!,
-    // 마이그레이션 전용 direct URL (Neon pooler는 migrate 미지원)
-    directUrl: process.env["DIRECT_URL"],
   },
 });
