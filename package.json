@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && DATABASE_URL=$DIRECT_URL prisma migrate deploy && next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "migrate": "DATABASE_URL=$DIRECT_URL prisma migrate deploy",
     "update-kr-stocks": "py scripts/generate-kr-stocks.py"
   },
   "dependencies": {
