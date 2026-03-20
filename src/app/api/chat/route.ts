@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const message = await prisma.chatMessage.create({
     data: {
       content: content.trim(),
-      userId: session.user.id,
+      userId: session.user.id!,
     },
     select: {
       id: true,

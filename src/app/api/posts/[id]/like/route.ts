@@ -8,7 +8,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!session?.user?.id) return NextResponse.json({ error: "로그인이 필요합니다" }, { status: 401 });
 
   const existing = await prisma.like.findUnique({
-    where: { userId_postId: { userId: session.user.id, postId } },
+    where: { userId_postId: { userId: session.user.id!, postId } },
   });
 
   if (existing) {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const count = await prisma.like.count({ where: { postId } });
     return NextResponse.json({ liked: false, count });
   } else {
-    await prisma.like.create({ data: { userId: session.user.id, postId } });
+    await prisma.like.create({ data: { userId: session.user.id!, postId } });
     const count = await prisma.like.count({ where: { postId } });
     return NextResponse.json({ liked: true, count });
   }

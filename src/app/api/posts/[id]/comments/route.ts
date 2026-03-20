@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       data: {
         content: parsed.data.content,
         parentId: parsed.data.parentId || null,
-        userId: session.user.id,
+        userId: session.user.id!,
         postId,
       },
       include: {

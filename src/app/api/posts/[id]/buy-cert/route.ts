@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
 
     const cert = await prisma.buyCertification.create({
-      data: { ...parsed.data, postId, userId: session.user.id },
+      data: { ...parsed.data, postId, userId: session.user.id! },
       include: { user: { select: { id: true, username: true, image: true } } },
     });
 

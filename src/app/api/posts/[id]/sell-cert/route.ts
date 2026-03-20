@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const profitRate = calcProfitRate(sellPrice, buyPrice);
 
     const cert = await prisma.sellCertification.create({
-      data: { ticker, sellPrice, buyPrice, profitRate, shares, note, postId, userId: session.user.id },
+      data: { ticker, sellPrice, buyPrice, profitRate, shares, note, postId, userId: session.user.id! },
       include: { user: { select: { id: true, username: true, image: true } } },
     });
 

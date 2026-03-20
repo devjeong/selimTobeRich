@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         tickerName: type === "STOCK" ? tickerName : null,
         market: type === "STOCK" ? market : null,
         sectorName: type === "SECTOR" ? sectorName : null,
-        userId: session.user.id,
+        userId: session.user.id!,
       },
       include: {
         user: { select: { id: true, username: true, image: true } },
