@@ -31,6 +31,9 @@ export function Header() {
           <Link href="/posts?recommendation=SELL" className="text-red-600 hover:text-red-700 transition-colors">
             매도 추천
           </Link>
+          <Link href="/leaderboard" className="text-yellow-600 hover:text-yellow-700 transition-colors">
+            🏆 수익률 랭킹
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
