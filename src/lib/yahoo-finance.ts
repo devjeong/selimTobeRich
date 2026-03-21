@@ -21,6 +21,15 @@ export interface StockQuote {
   market: "KR" | "US";
 }
 
+export interface StockDetail extends StockQuote {
+  volume: number | null;
+  open: number | null;
+  dayHigh: number | null;
+  dayLow: number | null;
+  fiftyTwoWeekHigh: number | null;
+  fiftyTwoWeekLow: number | null;
+}
+
 function detectMarket(symbol: string): "KR" | "US" {
   return symbol.endsWith(".KS") || symbol.endsWith(".KQ") ? "KR" : "US";
 }
@@ -92,6 +101,32 @@ export async function getStockQuote(symbol: string): Promise<StockQuote | null> 
     };
   } catch (error) {
     console.error("Yahoo Finance quote error:", error);
+    return null;
+  }
+}
+
+export async function getStockDetail(symbol: string): Promise<StockDetail | null> {
+  try {
+    const quote = await yahooFinance.quote(symbol);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const q = quote as any;
+    return {
+      symbol: q.symbol,
+      name: q.displayName || q.shortName || q.symbol,
+      price: q.regularMarketPrice ?? null,
+      change: q.regularMarketChange ?? null,
+      changePercent: q.regularMarketChangePercent ?? null,
+      currency: q.currency || "USD",
+      market: detectMarket(q.symbol),
+      volume: q.regularMarketVolume ?? null,
+      open: q.regularMarketOpen ?? null,
+      dayHigh: q.regularMarketDayHigh ?? null,
+      dayLow: q.regularMarketDayLow ?? null,
+      fiftyTwoWeekHigh: q.fiftyTwoWeekHigh ?? null,
+      fiftyTwoWeekLow: q.fiftyTwoWeekLow ?? null,
+    };
+  } catch (error) {
+    console.error("Yahoo Finance detail error:", error);
     return null;
   }
 }
