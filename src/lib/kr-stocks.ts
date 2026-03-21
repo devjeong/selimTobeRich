@@ -9,6 +9,12 @@ export interface KrStock {
 
 const KR_STOCKS: KrStock[] = stockData.stocks as KrStock[];
 
+/** 심볼로 한국어 종목명 조회 (예: "090710.KQ" → "휴림로봇") */
+export function getKrStockName(symbol: string): string | null {
+  const stock = KR_STOCKS.find((s) => s.symbol === symbol);
+  return stock?.name ?? null;
+}
+
 export function searchKrStocks(query: string): KrStock[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];

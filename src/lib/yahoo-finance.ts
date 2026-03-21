@@ -1,5 +1,5 @@
 import YahooFinanceClass from "yahoo-finance2";
-import { searchKrStocks } from "./kr-stocks";
+import { searchKrStocks, getKrStockName } from "./kr-stocks";
 
 const yahooFinance = new YahooFinanceClass();
 
@@ -85,14 +85,23 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
   }
 }
 
+function resolveKrName(symbol: string, yahooName: string): string {
+  // KR 종목은 로컬 DB에서 한국어 이름 우선 사용
+  if (detectMarket(symbol) === "KR") {
+    return getKrStockName(symbol) ?? yahooName;
+  }
+  return yahooName;
+}
+
 export async function getStockQuote(symbol: string): Promise<StockQuote | null> {
   try {
     const quote = await yahooFinance.quote(symbol);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const q = quote as any;
+    const yahooName: string = q.displayName || q.shortName || q.symbol;
     return {
       symbol: q.symbol,
-      name: q.displayName || q.shortName || q.symbol,
+      name: resolveKrName(q.symbol, yahooName),
       price: q.regularMarketPrice ?? null,
       change: q.regularMarketChange ?? null,
       changePercent: q.regularMarketChangePercent ?? null,
@@ -110,9 +119,10 @@ export async function getStockDetail(symbol: string): Promise<StockDetail | null
     const quote = await yahooFinance.quote(symbol);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const q = quote as any;
+    const yahooName: string = q.displayName || q.shortName || q.symbol;
     return {
       symbol: q.symbol,
-      name: q.displayName || q.shortName || q.symbol,
+      name: resolveKrName(q.symbol, yahooName),
       price: q.regularMarketPrice ?? null,
       change: q.regularMarketChange ?? null,
       changePercent: q.regularMarketChangePercent ?? null,
