@@ -78,7 +78,8 @@ function CandlestickLayer({ data }: { data: ChartDataPoint[] }) {
   if (!xScale || !yScale || !plotArea || !data.length) return null;
 
   // 밴드 스케일이면 bandwidth 사용, 아니면 균등 분할
-  const bandwidth = (xScale as (v: unknown) => number & { bandwidth?: () => number }).bandwidth?.() ?? 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const bandwidth = (xScale as any).bandwidth?.() ?? 0;
   const effectiveWidth = bandwidth > 0 ? bandwidth : plotArea.width / data.length;
   const cw = Math.max(2, effectiveWidth * 0.6);
 
