@@ -12,9 +12,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  useXAxisScale,
-  useYAxisScale,
-  usePlotArea,
 } from "recharts";
 import type { ChartDataPoint } from "@/app/api/stocks/chart/route";
 
@@ -69,49 +66,33 @@ function CustomTooltip({
   );
 }
 
-// 캔들스틱 레이어 — recharts v3 hooks 사용
-function CandlestickLayer({ data }: { data: ChartDataPoint[] }) {
-  const xScale = useXAxisScale();
-  const yScale = useYAxisScale();
-  const plotArea = usePlotArea();
+// 캔들스틱 Bar shape — recharts가 Bar shape에 yAxis.scale을 props로 전달
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CandlestickBar(props: any) {
+  const { x, width, open, close, high, low, yAxis } = props;
+  if (!yAxis?.scale) return null;
 
-  if (!xScale || !yScale || !plotArea || !data.length) return null;
+  const openY  = yAxis.scale(open);
+  const closeY = yAxis.scale(close);
+  const highY  = yAxis.scale(high);
+  const lowY   = yAxis.scale(low);
 
-  // 밴드 스케일이면 bandwidth 사용, 아니면 균등 분할
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const bandwidth = (xScale as any).bandwidth?.() ?? 0;
-  const effectiveWidth = bandwidth > 0 ? bandwidth : plotArea.width / data.length;
-  const cw = Math.max(2, effectiveWidth * 0.6);
+  if (openY == null || closeY == null || highY == null || lowY == null) return null;
+
+  const isUp = close >= open;
+  const color = isUp ? "#26a69a" : "#ef5350";
+  const cx = x + width / 2;
+  const cw = Math.max(2, width * 0.8);
+  const bodyTop = Math.min(openY, closeY);
+  const bodyHeight = Math.max(1, Math.abs(closeY - openY));
 
   return (
-    <>
-      {data.map((entry, i) => {
-        const x = xScale(entry.date);
-        if (x == null) return null;
-
-        const openY  = yScale(entry.open);
-        const closeY = yScale(entry.close);
-        const highY  = yScale(entry.high);
-        const lowY   = yScale(entry.low);
-
-        if (openY == null || closeY == null || highY == null || lowY == null) return null;
-
-        const isUp = entry.close >= entry.open;
-        const color = isUp ? "#26a69a" : "#ef5350";
-        const cx = x + effectiveWidth / 2;
-        const bodyTop = Math.min(openY, closeY);
-        const bodyHeight = Math.max(1, Math.abs(closeY - openY));
-
-        return (
-          <g key={i}>
-            {/* 꼬리(wick): high → low */}
-            <line x1={cx} y1={highY} x2={cx} y2={lowY} stroke={color} strokeWidth={1} />
-            {/* 몸통(body): open → close */}
-            <rect x={cx - cw / 2} y={bodyTop} width={cw} height={bodyHeight} fill={color} />
-          </g>
-        );
-      })}
-    </>
+    <g>
+      {/* 꼬리(wick): high → low */}
+      <line x1={cx} y1={highY} x2={cx} y2={lowY} stroke={color} strokeWidth={1} />
+      {/* 몸통(body): open → close */}
+      <rect x={cx - cw / 2} y={bodyTop} width={cw} height={bodyHeight} fill={color} />
+    </g>
   );
 }
 
@@ -292,7 +273,7 @@ export function StockChart({ ticker, currency, isPositive }: StockChartProps) {
                   tickFormatter={yAxisTickFormatter}
                 />
                 <Tooltip content={<CustomTooltip currency={currency} />} />
-                <CandlestickLayer data={data} />
+                <Bar dataKey="high" shape={<CandlestickBar />} isAnimationActive={false} />
               </ComposedChart>
             </ResponsiveContainer>
           )}
