@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  useYAxisScale,
 } from "recharts";
 import type { ChartDataPoint } from "@/app/api/stocks/chart/route";
 
@@ -66,16 +67,18 @@ function CustomTooltip({
   );
 }
 
-// 캔들스틱 Bar shape — recharts가 Bar shape에 yAxis.scale을 props로 전달
+// 캔들스틱 Bar shape — recharts v3에서는 yAxis가 shape props에 전달되지 않으므로 useYAxisScale 훅 사용
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CandlestickBar(props: any) {
-  const { x, width, open, close, high, low, yAxis } = props;
-  if (!yAxis?.scale) return null;
+  const yScale = useYAxisScale();
+  const { x, width, open, close, high, low } = props;
 
-  const openY  = yAxis.scale(open);
-  const closeY = yAxis.scale(close);
-  const highY  = yAxis.scale(high);
-  const lowY   = yAxis.scale(low);
+  if (!yScale) return null;
+
+  const openY  = yScale(open);
+  const closeY = yScale(close);
+  const highY  = yScale(high);
+  const lowY   = yScale(low);
 
   if (openY == null || closeY == null || highY == null || lowY == null) return null;
 
