@@ -10,6 +10,7 @@ export interface ChartDataPoint {
 }
 
 const PERIOD_CONFIG: Record<string, { range: string; interval: string }> = {
+  "1d":  { range: "1d",  interval: "5m" },
   "1w":  { range: "5d",  interval: "1d" },
   "1mo": { range: "1mo", interval: "1d" },
   "3mo": { range: "3mo", interval: "1d" },
@@ -22,11 +23,22 @@ const YF_HOSTS = [
   "https://query2.finance.yahoo.com",
 ];
 
+function formatDate(ts: number, isIntraday: boolean): string {
+  const d = new Date(ts * 1000);
+  if (isIntraday) {
+    // HH:MM UTC — 분봉 데이터는 시간만 표시
+    return d.toISOString().slice(11, 16);
+  }
+  return d.toISOString().split("T")[0];
+}
+
 async function fetchYahooChart(
   ticker: string,
   range: string,
   interval: string
 ): Promise<ChartDataPoint[]> {
+  const isIntraday = interval.endsWith("m") || interval.endsWith("h");
+  const revalidate = isIntraday ? 60 : 300;
   let lastError: unknown;
 
   for (const host of YF_HOSTS) {
@@ -38,7 +50,7 @@ async function fetchYahooChart(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
           Accept: "application/json",
         },
-        next: { revalidate: 300 },
+        next: { revalidate },
       });
 
       if (!res.ok) {
@@ -61,7 +73,7 @@ async function fetchYahooChart(
 
       const data: ChartDataPoint[] = timestamps
         .map((ts, i) => ({
-          date: new Date(ts * 1000).toISOString().split("T")[0],
+          date:   formatDate(ts, isIntraday),
           open:   q.open?.[i]   ?? 0,
           high:   q.high?.[i]   ?? 0,
           low:    q.low?.[i]    ?? 0,
