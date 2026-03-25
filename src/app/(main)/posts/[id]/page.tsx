@@ -93,7 +93,7 @@ export default async function PostDetailPage({ params }: { params: Promise<{ id:
 
         <div className="flex items-center justify-between text-sm text-gray-500 pb-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <Link href={`/profile/${post.user.username}`} className="font-medium text-gray-700 hover:text-blue-600">
+            <Link href={`/profile/${encodeURIComponent(post.user.username)}`} className="font-medium text-gray-700 hover:text-blue-600">
               {post.user.username}
             </Link>
             <span>{formatDate(post.createdAt)}</span>

@@ -57,7 +57,7 @@ export function Header() {
                 {menuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
                     <Link
-                      href={`/profile/${session.user?.name}`}
+                      href={`/profile/${encodeURIComponent(session.user?.name ?? "")}`}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                       onClick={() => setMenuOpen(false)}
                     >

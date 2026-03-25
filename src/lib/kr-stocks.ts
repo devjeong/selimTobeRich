@@ -9,10 +9,15 @@ export interface KrStock {
 
 const KR_STOCKS: KrStock[] = stockData.stocks as KrStock[];
 
+const KR_STOCKS_MAP = new Map(KR_STOCKS.map((s) => [s.symbol, s]));
+
+export function getKrStockBySymbol(symbol: string): KrStock | undefined {
+  return KR_STOCKS_MAP.get(symbol);
+}
+
 /** 심볼로 한국어 종목명 조회 (예: "090710.KQ" → "휴림로봇") */
 export function getKrStockName(symbol: string): string | null {
-  const stock = KR_STOCKS.find((s) => s.symbol === symbol);
-  return stock?.name ?? null;
+  return KR_STOCKS_MAP.get(symbol)?.name ?? null;
 }
 
 export function searchKrStocks(query: string): KrStock[] {

@@ -1,21 +1,29 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { PostCard } from "@/components/posts/PostCard";
+import ProfileSettings from "@/components/profile/ProfileSettings";
 import { formatDate } from "@/lib/utils";
 import type { PostWithUser } from "@/types";
 
 export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
-  const { username } = await params;
+  const { username: rawUsername } = await params;
+  const username = decodeURIComponent(rawUsername);
 
-  const user = await prisma.user.findUnique({
-    where: { username },
-    select: {
-      id: true, username: true, image: true, bio: true, createdAt: true,
-      _count: { select: { posts: true, comments: true, buyCertifications: true, sellCertifications: true } },
-    },
-  });
+  const [user, session] = await Promise.all([
+    prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true, username: true, image: true, bio: true, createdAt: true,
+        _count: { select: { posts: true, comments: true, buyCertifications: true, sellCertifications: true } },
+      },
+    }),
+    auth(),
+  ]);
 
   if (!user) notFound();
+
+  const isOwner = session?.user?.id === user.id;
 
   const posts = await prisma.post.findMany({
     where: { userId: user.id },
@@ -56,6 +64,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
           ))}
         </div>
       </div>
+
+      {/* 계정 설정 — 본인 프로필에서만 표시 */}
+      {isOwner && <ProfileSettings currentUsername={user.username} />}
 
       {/* 게시글 목록 */}
       <div>

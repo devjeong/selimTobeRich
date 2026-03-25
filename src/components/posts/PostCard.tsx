@@ -57,7 +57,7 @@ export function PostCard({ post }: Props) {
 
       <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
         <div className="flex items-center gap-3">
-          <Link href={`/profile/${post.user.username}`} className="hover:text-gray-700 font-medium">
+          <Link href={`/profile/${encodeURIComponent(post.user.username)}`} className="hover:text-gray-700 font-medium">
             {post.user.username}
           </Link>
           <span>{formatDate(post.createdAt)}</span>
