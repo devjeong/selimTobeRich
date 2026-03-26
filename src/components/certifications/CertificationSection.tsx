@@ -3,7 +3,13 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { formatDate, formatProfitRate } from "@/lib/utils";
+import { getKrStockName } from "@/lib/kr-stocks";
 import type { BuyCertification, SellCertification, User } from "@prisma/client";
+
+function tickerLabel(ticker: string): string {
+  const name = getKrStockName(ticker);
+  return name ? `${name} (${ticker})` : ticker;
+}
 
 type BuyCert = BuyCertification & { user: Pick<User, "id" | "username" | "image"> };
 type SellCert = SellCertification & { user: Pick<User, "id" | "username" | "image"> };
@@ -203,7 +209,7 @@ export function CertificationSection({ postId, ticker, initialBuyCerts, initialS
             <div key={cert.id} className="flex items-center justify-between bg-green-50 rounded-lg px-4 py-2.5 text-sm">
               <div className="flex items-center gap-3">
                 <span className="text-green-700 font-medium">📈 {cert.user.username}</span>
-                <span className="text-gray-600">{cert.ticker}</span>
+                <span className="text-gray-600">{tickerLabel(cert.ticker)}</span>
               </div>
               <div className="flex items-center gap-3 text-right">
                 <span className="font-semibold text-gray-900">{cert.avgBuyPrice.toLocaleString()}원</span>
@@ -225,7 +231,7 @@ export function CertificationSection({ postId, ticker, initialBuyCerts, initialS
             <div key={cert.id} className="flex items-center justify-between bg-red-50 rounded-lg px-4 py-2.5 text-sm">
               <div className="flex items-center gap-3">
                 <span className="text-red-700 font-medium">📉 {cert.user.username}</span>
-                <span className="text-gray-600">{cert.ticker}</span>
+                <span className="text-gray-600">{tickerLabel(cert.ticker)}</span>
               </div>
               <div className="flex items-center gap-4 text-right">
                 <div>

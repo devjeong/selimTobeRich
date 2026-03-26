@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { formatProfitRate, formatDate } from "@/lib/utils";
+import { getKrStockName } from "@/lib/kr-stocks";
+
+function tickerLabel(ticker: string): string {
+  const name = getKrStockName(ticker);
+  return name ?? ticker;
+}
 
 type Trade = {
   id: string;
@@ -194,7 +200,7 @@ export function LeaderboardTable() {
                           className="flex items-center justify-between bg-white rounded-lg px-3 py-2 text-xs border border-gray-100"
                         >
                           <div className="flex items-center gap-3">
-                            <span className="font-semibold text-gray-800 w-24 truncate">{trade.ticker}</span>
+                            <span className="font-semibold text-gray-800 w-28 truncate" title={trade.ticker}>{tickerLabel(trade.ticker)}</span>
                             <span className="text-gray-400">
                               매수 {trade.buyPrice.toLocaleString()} → 매도 {trade.sellPrice.toLocaleString()}
                             </span>
