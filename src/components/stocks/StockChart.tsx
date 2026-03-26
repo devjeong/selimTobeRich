@@ -74,14 +74,13 @@ function makeTimeFormatter(interval: ChartInterval, tz: string) {
 // ── MA 계산 ───────────────────────────────────────────────────────────────
 
 function calcMA(data: CandleItem[], period: number): LineData<Time>[] {
-  return data
-    .map((_, i) => {
-      if (i < period - 1) return null;
-      const slice = data.slice(i - period + 1, i + 1);
-      const avg = slice.reduce((s, d) => s + d.close, 0) / period;
-      return { time: data[i].time as UTCTimestamp, value: parseFloat(avg.toFixed(4)) };
-    })
-    .filter((d): d is LineData<Time> => d !== null);
+  const result: LineData<Time>[] = [];
+  for (let i = period - 1; i < data.length; i++) {
+    const slice = data.slice(i - period + 1, i + 1);
+    const avg = slice.reduce((s, d) => s + d.close, 0) / period;
+    result.push({ time: data[i].time as UTCTimestamp, value: parseFloat(avg.toFixed(4)) });
+  }
+  return result;
 }
 
 // ── 컴포넌트 ─────────────────────────────────────────────────────────────
