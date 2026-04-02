@@ -16,6 +16,9 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <Link href="/market" className="text-blue-600 hover:text-blue-700 transition-colors font-semibold">
+            📊 시장 현황
+          </Link>
           <Link href="/posts" className="text-gray-600 hover:text-blue-600 transition-colors">
             게시판
           </Link>
